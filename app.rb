@@ -13,7 +13,7 @@ S3_BUCKET='/test-direct-upload'
 
 # EXPIRE_TIME=(60 * 5) # 5 minutes
 EXPIRE_TIME=3000
-S3_URL='http://test-direct-upload.s3-website-eu-west-1.amazonaws.com/'
+S3_URL='http://s3.amazonaws.com'
 
 get '/' do
   send_file 'index.html'
