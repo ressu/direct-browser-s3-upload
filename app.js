@@ -1,30 +1,30 @@
-function createCORSRequest(method, url) 
+function createCORSRequest(method, url)
 {
   var xhr = new XMLHttpRequest();
-  if ("withCredentials" in xhr) 
+  if ("withCredentials" in xhr)
   {
     xhr.open(method, url, true);
-  } 
-  else if (typeof XDomainRequest != "undefined") 
+  }
+  else if (typeof XDomainRequest != "undefined")
   {
     xhr = new XDomainRequest();
     xhr.open(method, url);
-  } 
-  else 
+  }
+  else
   {
     xhr = null;
   }
   return xhr;
 }
 
-function handleFileSelect(evt) 
+function handleFileSelect(evt)
 {
   setProgress(0, 'Upload started.');
 
-  var files = evt.target.files; 
+  var files = evt.target.files;
 
   var output = [];
-  for (var i = 0, f; f = files[i]; i++) 
+  for (var i = 0, f; f = files[i]; i++)
   {
     uploadFile(f);
   }
@@ -36,14 +36,14 @@ function handleFileSelect(evt)
 function executeOnSignedUrl(file, callback)
 {
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', 'signput.php?name=' + file.name + '&type=' + file.type, true);
+  xhr.open('GET', 'signput?name=' + file.name + '&type=' + file.type, true);
 
   // Hack to pass bytes through unprocessed.
   xhr.overrideMimeType('text/plain; charset=x-user-defined');
 
-  xhr.onreadystatechange = function(e) 
+  xhr.onreadystatechange = function(e)
   {
-    if (this.readyState == 4 && this.status == 200) 
+    if (this.readyState == 4 && this.status == 200)
     {
       callback(decodeURIComponent(this.responseText));
     }
@@ -58,7 +58,7 @@ function executeOnSignedUrl(file, callback)
 
 function uploadFile(file)
 {
-  executeOnSignedUrl(file, function(signedURL) 
+  executeOnSignedUrl(file, function(signedURL)
   {
     uploadToS3(file, signedURL);
   });
@@ -71,13 +71,13 @@ function uploadFile(file)
 function uploadToS3(file, url)
 {
   var xhr = createCORSRequest('PUT', url);
-  if (!xhr) 
+  if (!xhr)
   {
     setProgress(0, 'CORS not supported');
   }
   else
   {
-    xhr.onload = function() 
+    xhr.onload = function()
     {
       if(xhr.status == 200)
       {
@@ -89,14 +89,14 @@ function uploadToS3(file, url)
       }
     };
 
-    xhr.onerror = function() 
+    xhr.onerror = function()
     {
       setProgress(0, 'XHR error.');
     };
 
-    xhr.upload.onprogress = function(e) 
+    xhr.upload.onprogress = function(e)
     {
-      if (e.lengthComputable) 
+      if (e.lengthComputable)
       {
         var percentLoaded = Math.round((e.loaded / e.total) * 100);
         setProgress(percentLoaded, percentLoaded == 100 ? 'Finalizing.' : 'Uploading.');
