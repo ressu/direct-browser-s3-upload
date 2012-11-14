@@ -3,9 +3,8 @@ require 'base64'
 require 'openssl'
 require 'cgi'
 
-S3_KEY='S3 key here'
-S3_SECRET='S3 secret here'
-S3_BUCKET='/uploadtestbucket'
+require './credentials.rb'
+S3_BUCKET='/test-direct-upload'
 
 EXPIRE_TIME=(60 * 5) # 5 minutes
 S3_URL='http://s3.amazonaws.com'
