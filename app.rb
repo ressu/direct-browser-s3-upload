@@ -3,9 +3,12 @@ require 'base64'
 require 'openssl'
 require 'cgi'
 
-require './credentials.rb'
-S3_KEY ||= ENV['S3_KEY']
-S3_SECRET ||= ENV['S3_SECRET']
+if File.exist? './credentials.rb'
+  require './credentials.rb'
+else
+  S3_KEY    = ENV['S3_KEY']
+  S3_SECRET = ENV['S3_SECRET']
+end
 S3_BUCKET='/test-direct-upload'
 
 EXPIRE_TIME=(60 * 5) # 5 minutes
