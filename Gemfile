@@ -1,4 +1,5 @@
 source 'http://rubygems.org'
 gem 'sinatra'
-gem 'unicorn'
-gem 'capistrano'
+gem 'capistrano-unicorn', require: false
+gem 'rvm-capistrano', require: false
+gem 'unicorn', require: false
