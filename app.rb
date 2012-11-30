@@ -2,7 +2,7 @@ require 'sinatra'
 require 'base64'
 require 'openssl'
 require 'cgi'
-require "config/aws"
+require './config/aws'
 
 get '/' do
   send_file 'index.html'

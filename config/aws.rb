@@ -7,9 +7,8 @@ EXPIRE_TIME=3000
 S3_URL='http://s3-ireland.amazonaws.com'
 
 begin
-  # Store AWS credentials in a file called aws-credentials.rb somewhere
-  # inside the load path
-  require 'aws-credentials'
+  # Store AWS credentials in a file called aws-credentials.rb
+  require './aws-credentials'
 rescue LoadError
   S3_KEY    = ENV['S3_KEY']
   S3_SECRET = ENV['S3_SECRET']
