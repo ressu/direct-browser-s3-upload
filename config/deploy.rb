@@ -5,16 +5,12 @@ set :deploy_to, "/srv/badwolf/direct-s3-upload"
 
 set :user, "ressu"
 ssh_options[:forward_agent] = true
-set :deploy_via, :copy
-set :repository,  "."
+set :deploy_via, :remote_cache
+set :repository,  "https://github.com/ressu/direct-browser-s3-upload.git"
 
 set :use_sudo, false
 set :copy_strategy, :export
 set :copy_cache, true
-
-
-# set :scm, :git # You can set :scm explicitly or Capistrano will make an intelligent guess based on known version control directory names
-# Or: `accurev`, `bzr`, `cvs`, `darcs`, `git`, `mercurial`, `perforce`, `subversion` or `none`
 
 server "web1.badwolf.fi", :web, :app
 
