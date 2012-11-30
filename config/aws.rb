@@ -12,4 +12,4 @@ S3_BUCKET='/direct-upload' unless defined?(S3_BUCKET)
 
 # EXPIRE_TIME=(60 * 5) # 5 minutes
 EXPIRE_TIME=3000 unless defined?(EXPIRE_TIME)
-S3_URL='http://s3-ireland.amazonaws.com' unless defined?(S3_URL)
+S3_URL='http://s3-eu-west-1.amazonaws.com' unless defined?(S3_URL)
