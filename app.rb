@@ -2,18 +2,7 @@ require 'sinatra'
 require 'base64'
 require 'openssl'
 require 'cgi'
-
-if File.exist? './credentials.rb'
-  require './credentials.rb'
-else
-  S3_KEY    = ENV['S3_KEY']
-  S3_SECRET = ENV['S3_SECRET']
-end
-S3_BUCKET='/test-direct-upload'
-
-# EXPIRE_TIME=(60 * 5) # 5 minutes
-EXPIRE_TIME=3000
-S3_URL='http://s3-ireland.amazonaws.com'
+require "config/aws"
 
 get '/' do
   send_file 'index.html'
@@ -37,5 +26,5 @@ get '/signput' do
   stringToSign = "PUT\n\n#{mimeType}\n#{expires}\n#{amzHeaders}\n#{S3_BUCKET}#{objectName}";
   sig = CGI::escape(Base64.strict_encode64(OpenSSL::HMAC.digest('sha1', S3_SECRET, stringToSign)))
 
-  CGI::escape("http://test-direct-upload.s3.amazonaws.com#{objectName}?AWSAccessKeyId=#{S3_KEY}&Expires=#{expires}&Signature=#{sig}")
+  CGI::escape("#{S3_URL}#{S3_BUCKET}/#{objectName}?AWSAccessKeyId=#{S3_KEY}&Expires=#{expires}&Signature=#{sig}")
 end
