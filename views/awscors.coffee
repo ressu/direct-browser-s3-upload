@@ -1,6 +1,11 @@
-$ -> 
+$ ->
+  unless $.support.cors = true
+    msg = "Your browser doesn't appear to support all required features.
+      Selecting OK will send you to a download page of one such browser"
+    if confirm(msg)
+      window.location = "http://google.com/chrome"
   $('#files').change(handleFileSelect)
-  setProgress(0, 'Waiting for upload.')
+  setProgress(0, 'Waiting for file selection.')
 
 ###
 Utility Function to update the progressbar
@@ -34,37 +39,31 @@ uploadFile = (file, callback) ->
 Use a CORS call to upload the given file to S3. Assumes the url
 parameter has been signed and is accessible for upload.
 ###
-createCORSRequest = (method, url) ->
-  xhr = new XMLHttpRequest()
-  if "withCredentials" of xhr
-    xhr.open method, url, true
-  else unless typeof XDomainRequest is "undefined"
-    xhr = new XDomainRequest()
-    xhr.open method, url
-  else
-    return null
-  return xhr
 
 uploadToS3 = (file, url) ->
-  xhr = createCORSRequest("PUT", url)
-  unless xhr
-    setProgress 0, "CORS not supported"
-  else
-    xhr.onload = ->
-      if xhr.status is 200
-        setProgress 100, "Upload completed."
-      else
-        setProgress 0, "Upload error: " + xhr.status
+  # Make the PUT request.
+  $.ajax
+    type: "PUT"
+    url: url
+    # This needs to be thought through.
+    # xhr.setRequestHeader "x-amz-acl", "public-read"
+    data: file
 
-    xhr.onerror = ->
-      setProgress 0, "XHR error."
+    contentType: file.type
+    processData: false
 
-    xhr.upload.onprogress = (e) ->
-      if e.lengthComputable
-        percentLoaded = Math.round((e.loaded / e.total) * 100)
-        setProgress percentLoaded, (if percentLoaded is 100 then "Finalizing." else "Uploading.")
+    error: (e, text, msg) ->
+      console.log "ERROR:", e
+      setProgress 0, "Upload failed: (#{text})#{msg}"
 
-    xhr.setRequestHeader "Content-Type", file.type
-    xhr.setRequestHeader "x-amz-acl", "public-read"
-    xhr.send file
+    success: ->
+      setProgress 100, "Upload completed."
 
+    beforeSend: (xhr, settings) ->
+      xhr.upload.onProgress(updateProgress) if xhr.upload
+      xhr.setRequestHeader "x-amz-acl", "public-read"
+
+updateProgress = (e) ->
+  if e.lengthComputable
+    percentLoaded = Math.round((e.loaded / e.total) * 100)
+    setProgress percentLoaded, (if percentLoaded is 100 then "Finalizing." else "Uploading.")
