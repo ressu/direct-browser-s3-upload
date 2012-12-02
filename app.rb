@@ -14,12 +14,16 @@ get '/styles.css' do
   send_file 'styles.css'
 end
 
-get '/app.js' do
-  send_file 'app.js'
-end
-
 get '/awscors.js' do
   coffee :awscors
+end
+
+get '/robots.txt' do
+  content_type :text
+  '''
+  User-agent:*
+  Disallow: *
+  '''
 end
 
 get '/signput' do
