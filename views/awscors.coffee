@@ -32,7 +32,8 @@ uploadFile = (file, callback) ->
     { name: file.name.toString(), type: file.type.toString() },
     (urldata) ->
       setProgress 0, "Metadata received."
-      uploadToS3 file, urldata.upload_url
+      x = uploadToS3 file, urldata.upload_url
+      console.log "jqXHR", x
   )
 
 ###
@@ -41,7 +42,6 @@ parameter has been signed and is accessible for upload.
 ###
 
 uploadToS3 = (file, url) ->
-  # Make the PUT request.
   $.ajax
     type: "PUT"
     url: url
@@ -50,20 +50,20 @@ uploadToS3 = (file, url) ->
     data: file
 
     contentType: file.type
+    contentSize: file.size
     processData: false
 
-    error: (e, text, msg) ->
-      console.log "ERROR:", e
-      setProgress 0, "Upload failed: (#{text})#{msg}"
-
-    success: ->
-      setProgress 100, "Upload completed."
-
     beforeSend: (xhr, settings) ->
-      xhr.upload.onProgress(updateProgress) if xhr.upload
       xhr.setRequestHeader "x-amz-acl", "public-read"
 
-updateProgress = (e) ->
-  if e.lengthComputable
-    percentLoaded = Math.round((e.loaded / e.total) * 100)
-    setProgress percentLoaded, (if percentLoaded is 100 then "Finalizing." else "Uploading.")
+  .fail (e, text, msg) ->
+    setProgress 0, "Upload failed: (#{text})#{msg}"
+
+  .done ->
+    setProgress 100, "Upload completed."
+
+  .progress (data) ->
+    console.log "hitting update progress"
+    if data.lengthComputable
+      percentLoaded = Math.round((data.loaded / data.total) * 100)
+      setProgress percentLoaded, (if percentLoaded is 100 then "Finalizing." else "Uploading.")
