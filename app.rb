@@ -14,16 +14,20 @@ get '/styles.css' do
   send_file 'styles.css'
 end
 
+get '/favicon.ico' do
+  send_file 'favicon.ico'
+end
+
 get '/awscors.js' do
   coffee :awscors
 end
 
 get '/robots.txt' do
   content_type :text
-  '''
-  User-agent:*
-  Disallow: *
-  '''
+  robots_txt = <<-ROBOTS.gsub(/^ {4}/, '')
+    User-agent:*
+    Disallow: *
+  ROBOTS
 end
 
 get '/signput' do
