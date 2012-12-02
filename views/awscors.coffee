@@ -45,15 +45,24 @@ uploadToS3 = (file, url) ->
   $.ajax
     type: "PUT"
     url: url
-    # This needs to be thought through.
-    # xhr.setRequestHeader "x-amz-acl", "public-read"
     data: file
 
     contentType: file.type
     contentSize: file.size
     processData: false
 
+    # Since jQuery doesn't yet know how to handle upload progress, do the setup
+    # manually.
+    xhr: ->
+      xhr = $.ajaxSettings.xhr()
+      if xhr.upload
+        xhr.upload.addEventListener('progress', uploadProgress, false)
+      else
+        setProgress 50, "Browser doesn't support upload progress reporting"
+      return xhr
+
     beforeSend: (xhr, settings) ->
+      # This needs to be thought through.
       xhr.setRequestHeader "x-amz-acl", "public-read"
 
   .fail (e, text, msg) ->
@@ -62,8 +71,8 @@ uploadToS3 = (file, url) ->
   .done ->
     setProgress 100, "Upload completed."
 
-  .progress (data) ->
-    console.log "hitting update progress"
-    if data.lengthComputable
-      percentLoaded = Math.round((data.loaded / data.total) * 100)
-      setProgress percentLoaded, (if percentLoaded is 100 then "Finalizing." else "Uploading.")
+uploadProgress = (evt) ->
+  console.log "hitting update progress", evt
+  if evt.lengthComputable
+    percentLoaded = Math.round((evt.loaded / evt.total) * 100)
+    setProgress percentLoaded, (if percentLoaded is 100 then "Finalizing." else "Uploading.")
