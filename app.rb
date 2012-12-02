@@ -24,7 +24,7 @@ end
 
 get '/signput' do
   content_type :json
-  objectName = "/#{params['name']}"
+  objectName = "/#{CGI::escape(params['name'])}"
 
   mimeType = params['type']
   expires = Time.now.getutc.to_i + EXPIRE_TIME
