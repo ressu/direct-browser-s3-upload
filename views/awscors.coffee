@@ -19,9 +19,13 @@ setProgress = (percent, statusLabel) ->
 # Handler for the file selection
 ###
 handleFileSelect = (evt) ->
-  files = evt.target.files
-  for f in files
-    uploadFile(f)
+  # Handle older IE failing miserably
+  if evt.target.files
+    for f in evt.target.files
+      uploadFile(f)
+  else
+    uploadFile($(this).val())
+
 
 ###
 # Initializer for the upload, fetches required metadata from the server
